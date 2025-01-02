@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import './Logout.css'; // Import the CSS for styling
 
-const Logout = () => {
+const Logout = ({ onLogout }) => {
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -12,12 +12,13 @@ const Logout = () => {
       // Example of clearing session or token
       localStorage.removeItem("authToken"); // Clear user session (replace with your actual logic)
       setLoading(false); // Set loading to false once logout is complete
-      navigate("/login"); // Redirect to Login page after logout
+      onLogout(); // Call the onLogout prop to update authentication status in App.js
+      navigate("/"); // Redirect to Login page after logout
     };
 
     // Simulate delay for logout (2 seconds)
     setTimeout(logoutUser, 2000);
-  }, [navigate]);
+  }, [navigate, onLogout]);
 
   return (
     <div className="logout-container">
@@ -40,3 +41,4 @@ const Logout = () => {
 };
 
 export default Logout;
+

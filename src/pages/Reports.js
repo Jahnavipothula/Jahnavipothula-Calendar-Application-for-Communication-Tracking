@@ -151,7 +151,7 @@ const Reports = () => {
         >
 
              <Link
-                            to="/"
+                            to="/home"
                             style={{
                               display: "block",
                               padding: "8px 16px",

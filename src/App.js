@@ -16,9 +16,8 @@
 
 // export default App;
 
-
-import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import React, { useState } from "react";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Home from './pages/Home';
 import Admin from "./pages/Admin";
 import Dashboard from "./pages/Dashboard";
@@ -26,32 +25,97 @@ import Reports from "./pages/Reports";
 import Profile from './pages/Profile';
 import Settings from './pages/Settings';
 import Logout from './pages/Logout';
-
+import Login from './pages/Login';
+import CreateAccount from './pages/CreateAccount';  // Import Create Account page
+import ForgotPassword from './pages/ForgotPassword';  // Import Forgot Password page
 
 function App() {
+  // State to manage authentication
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  // Function to handle login status
+  const handleLogin = (status) => {
+    setIsAuthenticated(status);
+  };
+
+  // Function to handle logout
+  const handleLogout = () => {
+    setIsAuthenticated(false); // Set the authentication status to false on logout
+    localStorage.removeItem("authToken"); // Optionally clear any stored session data (e.g., auth token)
+  };
+
   return (
     <Router>
       <Routes>
-      <Route path="/" element={<Home />} />
+        {/* Public Login Page */}
+        <Route
+          path="/"
+          element={
+            isAuthenticated ? <Navigate to="/home" /> : <Login onLogin={handleLogin} />
+          }
+        />
+        
+        {/* Create Account Route (Public) */}
+        <Route path="/create-account" element={<CreateAccount />} />
+        
+        {/* Forgot Password Route (Public) */}
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
-       
-        <Route path="/admin" element={<Admin />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/reports" element={<Reports />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/settings" element={<Settings />} />
-        <Route path="/logout" element={<Logout />} />
+        {/* Protected Home Route */}
+        <Route
+          path="/home"
+          element={
+            isAuthenticated ? <Home /> : <Navigate to="/" />
+          }
+        />
+
+        {/* Protected Admin Route */}
+        <Route
+          path="/admin"
+          element={
+            isAuthenticated ? <Admin /> : <Navigate to="/" />
+          }
+        />
+
+        {/* Protected Routes for Other Pages */}
+        <Route
+          path="/dashboard"
+          element={
+            isAuthenticated ? <Dashboard /> : <Navigate to="/" />
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            isAuthenticated ? <Reports /> : <Navigate to="/" />
+          }
+        />
+        <Route
+          path="/profile"
+          element={
+            isAuthenticated ? <Profile /> : <Navigate to="/" />
+          }
+        />
+        <Route
+          path="/settings"
+          element={
+            isAuthenticated ? <Settings /> : <Navigate to="/" />
+          }
+        />
+        
+        {/* Logout Route */}
+        <Route
+          path="/logout"
+          element={
+            isAuthenticated ? <Logout onLogout={handleLogout} /> : <Navigate to="/" />
+          }
+        />
       </Routes>
     </Router>
   );
 }
 
 export default App;
-
-
-
-
-
 
 
 

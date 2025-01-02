@@ -115,7 +115,7 @@ const MenuButton = () => {
             {/* Home Link */}
             <li style={{ margin: "10px 0" }}>
               <Link
-                to="/"
+                to="/home"
                 style={{
                   display: "block",
                   padding: "8px 16px",

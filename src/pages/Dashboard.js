@@ -174,6 +174,8 @@ const Dashboard = () => {
     { name: "Company C", communications: [], lastCommunication: "2024-12-28", nextCommunication: "2024-12-31", status: "green" },
   ]);
   const [selectedCompany, setSelectedCompany] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedCompany, setEditedCompany] = useState({});
 
   const today = new Date().toISOString().split("T")[0];
   const overdueCompanies = companies.filter((company) => new Date(company.nextCommunication) < new Date(today));
@@ -214,27 +216,27 @@ const Dashboard = () => {
     console.log("Communications on", dateString, communicationsOnDate);
   };
 
+  const handleEditCompany = (company) => {
+    setEditedCompany(company);
+    setIsEditing(true);
+  };
+
+  const handleSaveCompany = () => {
+    setCompanies(companies.map((company) =>
+      company.name === editedCompany.name ? editedCompany : company
+    ));
+    setIsEditing(false);
+    setEditedCompany({});
+  };
+
+  const handleChangeCompanyField = (field, value) => {
+    setEditedCompany({ ...editedCompany, [field]: value });
+  };
+
   return (
     <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", backgroundColor: "#f8f9fa", minHeight: "100vh" }}>
-      {/* Header */}
       <MenuButton />
-      {/* <h1 style={{ textAlign: "center", fontSize: "2.5rem", color: "#6c63ff", marginBottom: "30px" }}>📊 Dashboard 📊</h1> */}
-      {/* <h1
-  style={{
-    color: "white", // Blue color, same as profile link
-    textAlign: "center",
-    fontSize: "2.5rem", // You can adjust this size if needed
-    fontWeight: "bold",
-    marginBottom: "20px", // Adding margin for spacing
-    backgroundColor: "blue", // Background color to match profile link style
-    padding: "10px 20px", // Add some padding for a button-like feel
-    borderRadius: "5px", // Rounded corners like the profile link
-    boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", // Adding box shadow for a clean look
-  }}
->📊 Dashboard 📊
-</h1> */}
-
-<div style={{
+      <div style={{
         backgroundColor: "#007bff", 
         color: "white", 
         padding: "20px", 
@@ -246,14 +248,14 @@ const Dashboard = () => {
       </div>
 
       {/* Notifications Section */}
-      <section style={{ marginBottom: "30px" }}>
+      <section style={{ marginBottom: "30px", borderRadius: "8px", boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)", backgroundColor: "#ffffff", padding: "20px" }}>
         <h2 style={{ fontSize: "1.5rem", color: "#2196f3", marginBottom: "15px" }}>Notifications</h2>
         <div>
-          <h3 style={{ color: "#dc3545" }}>Overdue Communications</h3>
-          <ul style={{ listStyle: "none", paddingLeft: "0" }}>
+          <h3 style={{ color: "#dc3545", marginBottom: "10px" }}>Overdue Communications</h3>
+          <ul style={{ listStyle: "none", paddingLeft: "0", marginBottom: "15px" }}>
             {overdueCompanies.length > 0 ? (
               overdueCompanies.map((company, index) => (
-                <li key={index} style={{ marginBottom: "5px", fontSize: "1rem" }}>
+                <li key={index} style={{ marginBottom: "10px", fontSize: "1rem", color: "#dc3545" }}>
                   🏢 {company.name} (Due: {company.nextCommunication})
                 </li>
               ))
@@ -261,11 +263,11 @@ const Dashboard = () => {
               <li style={{ color: "#28a745", fontSize: "1rem" }}>No overdue communications</li>
             )}
           </ul>
-          <h3 style={{ color: "#ffc107" }}>Today's Communications</h3>
+          <h3 style={{ color: "#ffc107", marginBottom: "10px" }}>Today's Communications</h3>
           <ul style={{ listStyle: "none", paddingLeft: "0" }}>
             {todayCompanies.length > 0 ? (
               todayCompanies.map((company, index) => (
-                <li key={index} style={{ marginBottom: "5px", fontSize: "1rem" }}>
+                <li key={index} style={{ marginBottom: "10px", fontSize: "1rem", color: "#ffc107" }}>
                   🏢 {company.name} (Due: {company.nextCommunication})
                 </li>
               ))
@@ -279,16 +281,23 @@ const Dashboard = () => {
       {/* Calendar Section */}
       <section style={{ marginBottom: "30px" }}>
         <h2 style={{ fontSize: "1.5rem", color: "#2196f3", marginBottom: "15px" }}>Calendar</h2>
-        <Calendar
-          onClickDay={handleDateClick}
-          tileContent={({ date }) => {
-            const dateString = date.toISOString().split("T")[0];
-            const isCommunication = companies.some((company) =>
-              company.communications.some((comm) => comm.date === dateString)
-            );
-            return isCommunication ? <span style={{ color: "#6c63ff" }}>📌</span> : null;
-          }}
-        />
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div>
+            <h3 style={{ fontSize: "1.2rem", color: "#333" }}>
+              {new Date().toLocaleDateString("en-US", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
+            </h3>
+          </div>
+          <Calendar
+            onClickDay={handleDateClick}
+            tileContent={({ date }) => {
+              const dateString = date.toISOString().split("T")[0];
+              const isCommunication = companies.some((company) =>
+                company.communications.some((comm) => comm.date === dateString)
+              );
+              return isCommunication ? <span style={{ color: "#6c63ff" }}>📌</span> : null;
+            }}
+          />
+        </div>
       </section>
 
       {/* Upcoming Communications Section */}
@@ -325,10 +334,25 @@ const Dashboard = () => {
                       borderRadius: "5px",
                       cursor: "pointer",
                       fontSize: "0.9rem",
+                      marginRight: "10px",
                     }}
                     onClick={() => handleLogCommunication(company)}
                   >
                     Log Communication
+                  </button>
+                  <button
+                    style={{
+                      padding: "10px 15px",
+                      backgroundColor: "#ffc107",
+                      color: "#ffffff",
+                      border: "none",
+                      borderRadius: "5px",
+                      cursor: "pointer",
+                      fontSize: "0.9rem",
+                    }}
+                    onClick={() => handleEditCompany(company)}
+                  >
+                    Edit
                   </button>
                 </td>
               </tr>
@@ -336,6 +360,47 @@ const Dashboard = () => {
           </tbody>
         </table>
       </section>
+
+      {/* Edit Company Modal */}
+      {isEditing && (
+        <div style={{ backgroundColor: "#ffffff", padding: "20px", boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)", borderRadius: "8px" }}>
+          <h3 style={{ color: "#333", marginBottom: "20px" }}>Edit Company</h3>
+          <input
+            type="text"
+            value={editedCompany.name}
+            onChange={(e) => handleChangeCompanyField("name", e.target.value)}
+            placeholder="Company Name"
+            style={{ padding: "10px", marginBottom: "10px", width: "100%", borderRadius: "5px", border: "1px solid #ddd" }}
+          />
+          <input
+            type="date"
+            value={editedCompany.lastCommunication}
+            onChange={(e) => handleChangeCompanyField("lastCommunication", e.target.value)}
+            style={{ padding: "10px", marginBottom: "10px", width: "100%", borderRadius: "5px", border: "1px solid #ddd" }}
+          />
+          <input
+            type="date"
+            value={editedCompany.nextCommunication}
+            onChange={(e) => handleChangeCompanyField("nextCommunication", e.target.value)}
+            style={{ padding: "10px", marginBottom: "10px", width: "100%", borderRadius: "5px", border: "1px solid #ddd" }}
+          />
+          <button
+            onClick={handleSaveCompany}
+            style={{
+              padding: "10px 15px",
+              backgroundColor: "#28a745",
+              color: "#ffffff",
+              border: "none",
+              borderRadius: "5px",
+              cursor: "pointer",
+              fontSize: "1rem",
+              width: "100%",
+            }}
+          >
+            Save Changes
+          </button>
+        </div>
+      )}
 
       {/* Log Communication Modal */}
       {selectedCompany && (
