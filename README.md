@@ -2,7 +2,7 @@
 
 **Live Demo:**
 Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-[Calendar Application](https://calendar-application-tracking.netlify.app/)
+Deployed site link 👉[Calendar Application](https://calendar-application-tracking.netlify.app/)
 
 ## Description  
 The Calendar Application is a powerful tool designed to streamline communication tracking and engagement reporting. It enables admins and users to effectively monitor, analyze, and optimize their communication efforts.  
